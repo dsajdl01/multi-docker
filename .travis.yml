@@ -1,0 +1,29 @@
+sudo: required
+language: generic
+# to have access to docker
+services:
+- docker
+
+# build our docker file (to run test – therefore not production file)
+before_install:
+  - docker build -t dsajdl/react-test -f ./client/Dockerfile.dev ./client
+
+script:
+   # - docker run dsajdl/react-test npm test -- --coderage (this is old configuration)
+- docker run -e CI=true dsajdl/react-test npm test
+
+# build it only if test is successful
+after_success:
+  - docker build -t dsajdl/multi-client ./client
+  - docker build -t dsajdl/multi-nginx ./nginx
+  - docker build -t dsajdl/multi-server ./server
+  - docker build -t dsajdl/multi-worker ./worker
+  # Log in to the docker CLI with one single command
+  # echo "$DOCKER_PASSWORD" --> retrive pasword from Environment Variables and emit channel 
+  # docker login -u "$DOCKER_ID" --password-stdin --> second channel where password is emitted and use docker id standart in
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_ID" --password-stdin
+  # Take those images and push them to docker hub
+  - docker push dsajdl/multi-client
+  - docker push dsajdl/multi-nginx
+  - docker push dsajdl/multi-server
+  - docker push dsajdl/multi-worker
