@@ -1,0 +1,40 @@
+{
+	"AWSDockerrunVersion": 2,
+	"containerDefinitions": [
+		{
+			"name": "client",
+			"image": "dsajdl/multi-client",
+			"hostname": "client",
+			"essential": false,
+			"memory": 182
+		},
+		{
+			"name": "server",
+			"image": "dsajdl/multi-server",
+			"hostname": "api",
+			"essential": false,
+			"memory": 182
+		},
+		{
+			"name": "worker",
+			"image": "dsajdl/multi-worker",
+			"hostname": "worker",
+			"essential": false,
+			"memory": 182
+		},
+		{
+			"name": "nginx",
+			"image": "dsajdl/multi-nginx",
+			"hostname": "nginx",
+			"essential": true,
+			"memory": 182,
+			"portMappings": [
+				{
+					"hostPort": 80,
+					"containerPort": 80
+				}
+			],
+			"links": ["client", "server"]
+		}
+	]
+}
